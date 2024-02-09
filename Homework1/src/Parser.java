@@ -18,6 +18,7 @@ import java.util.Map;
 public class Parser {
     private Map<String, Object> variables; // Map to store variables and their values
     boolean key = true; // Flag to control parsing process
+    int numberOfLine = 1;
 
     /**
      * Constructor for Parser class. Initializes the variables map.
@@ -63,12 +64,15 @@ public class Parser {
             switch (tokens[0]) { // Determine the type of command based on the first token
                 case "FOR":
                     handleForLoop(tokens); // Handle a for loop command
+                    numberOfLine++;
                     break;
                 case "PRINT":
                     handlePrint(tokens[1]); // Handle a print command
+                    numberOfLine++;
                     break;
                 default:
                     handleOperator(tokens); // Handle other operator commands
+                    numberOfLine++;
             }
         }
     }
@@ -137,7 +141,7 @@ public class Parser {
         } else if (varValue instanceof String && parsedValue instanceof String) { // Check if both values are strings
             variables.put(variable, (String) varValue + (String) parsedValue); // Concatenate strings and update variable
         } else { // Handle incompatible types
-            System.err.println("RUNTIME ERROR: line " + variable); // Print error message
+            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
         }
     }
@@ -156,7 +160,7 @@ public class Parser {
         if (varValue instanceof Integer && parsedValue instanceof Integer) { // Check if both values are integers
             variables.put(variable, (Integer) varValue - (Integer) parsedValue); // Perform subtraction and update variable
         } else { // Handle incompatible types
-            System.err.println("RUNTIME ERROR: line " + variable); // Print error message
+            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
         }
     }
@@ -175,7 +179,7 @@ public class Parser {
         if (varValue instanceof Integer && parsedValue instanceof Integer) { // Check if both values are integers
             variables.put(variable, (Integer) varValue * (Integer) parsedValue); // Perform multiplication and update variable
         } else { // Handle incompatible types
-            System.err.println("RUNTIME ERROR: line " + variable); // Print error message
+            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
         }
     }
@@ -199,7 +203,7 @@ public class Parser {
             // Parse the number of iterations from the second token
             iterations = Integer.parseInt(tokens[1]);
         } catch (NumberFormatException e) {
-            System.err.println("RUNTIME ERROR: Invalid loop iteration count"); // Print error message
+            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
             return; // Exit method
         }
@@ -224,7 +228,7 @@ public class Parser {
         if (value != null) { // Check if the variable is assigned
             System.out.println((variable + "=" + value).replace("\"", "")); // Print variable name and value
         } else {
-            System.err.println("Runtime error: Variable " + variable + " has not been assigned a value"); // Print error message
+            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
         }
     }
