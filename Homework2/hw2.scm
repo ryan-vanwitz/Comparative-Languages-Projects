@@ -218,8 +218,11 @@
 ; state -- state
 ; zips -- zipcode DB
 (define (zipCount state zips)
-	0
-)
+	(if (null? zips)
+      0
+      (if (string=? (caddr (car zips)) state)
+          (+ 1 (zipCount state (cdr zips)))
+          (zipCount state (cdr zips)))))
 
 (line "zipCount")
 (mydisplay (zipCount "OH" zipcodes))
@@ -254,7 +257,7 @@
 ; filters -- list of predicates to apply to the individual elements
 
 (define (filterList lst filters)
-	lst
+	(if equal? (cadd lst)(POS?)
 )
 
 (line "filterList")
