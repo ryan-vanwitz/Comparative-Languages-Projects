@@ -27,7 +27,7 @@
 ; Return a list with only the negatives items
 (define (negatives lst)
     (if (null? lst)
-      '() ; or lst
+      '()
       (if (negative? (car lst))
           (cons (car lst) (negatives (cdr lst)))
           (negatives (cdr lst))
@@ -69,15 +69,24 @@
 ; Returns a list of two numeric values. The first is the smallest 
 ; in the list and the second is the largest in the list. 
 ; lst -- contains numeric values, and length is >= 1.
-(define (minAndMax lst)
-(let ((min (car lst)) 
-        (max (car lst)))
-    (for-each (lambda (x) 
-                (when (< x min) (set! min x)) 
-                (when (> x max) (set! max x)))
-              (cdr lst))
-    (list min max))
- )
+(define (minAndMax lst) 
+	(list (minelt lst) (maxelt lst))
+)
+
+(define (maxelt lst)
+  (if (= (length lst) 1)
+      (car lst)
+      (max (car lst) (maxelt (cdr lst)))
+  )
+)
+
+(define (minelt lst)
+  (if (= (length lst) 1)
+      (car lst)
+      (min (car lst) (minelt (cdr lst)))
+  )
+)
+
 
 (line "minAndMax")
 (mydisplay (minAndMax '(1 2 -3 4 2)))  ; -> (-3 4)
@@ -110,27 +119,21 @@
 ; ((1 a) (1 b) (1 c) (2 a) (2 b) (2 c))
 ; lst1 & lst2 -- two flat lists.
 (define (crossproduct lst1 lst2)
-  (if (null? lst1)
+ (if (null? lst1)
       '()
-      (let loop ((lst1 lst1))
-        (if (null? lst1)
-            '()
-            (append (combineValues (car lst1) lst2)
-                    (loop (cdr lst1))
-            )
-        )
-     )
-   )
- )
+      (append (combineValues (car lst1) lst2)
+              (crossproduct (cdr lst1) lst2))
+      )
+  )
 
 (define (combineValues x lst)
   (if (null? lst)
       '()
       (cons (list x (car lst))
             (combineValues x (cdr lst))
-       )
-   )
-)
+            )
+      )
+  )
   
 (line "crossproduct")
 (mydisplay (crossproduct '(1 2) '(a b c)))
@@ -145,8 +148,9 @@
 ; from the 'zipcodes.scm' file for this. You can just call 'zipcodes' directly
 ; as shown in the sample example
 (define (getLatLon zipcode zips)
-	(list zipcode (car zips))
-)
+   (cond ((null? zips) '())
+        ((= (caar zips) zipcode) (cddddr (car zips)))
+        (else (getLatLon zipcode (cdr zips)))))
 
 (line "getLatLon")
 (mydisplay (getLatLon 45056 zipcodes))
