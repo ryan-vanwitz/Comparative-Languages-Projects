@@ -54,7 +54,7 @@ public class Parser {
         }
 
         String[] tokens = line.split("\\s+"); // Split the line into tokens
-        if (tokens.length < 3 || (!tokens[tokens.length - 1].equals("ENDFOR") && !tokens[tokens.length - 1].equals(";"))) {
+        if ((!tokens[tokens.length - 1].equals("ENDFOR") && !tokens[tokens.length - 1].equals(";"))) {
             // Check for syntax errors in the line
             System.err.println("Syntax error: " + line); // Print syntax error message
             return; // Return without further processing
@@ -101,7 +101,7 @@ public class Parser {
                 handleMultiplicationAssignment(variable, value, tokens); // Handle multiplication assignment
                 break;
             default:
-                System.out.println("IOException"); // Handle unknown operator
+            	System.err.println("Unknown operator: " + operator + " at line " + numberOfLine); // Handle unknown operator
                 key = false; // Disable further parsing
         }
     }
@@ -191,29 +191,31 @@ public class Parser {
      * @param tokens the tokens representing the for loop command
      */
     private void handleForLoop(String[] tokens) {
-        if (tokens.length < 5 || !tokens[tokens.length - 1].equals("ENDFOR")) {
+        if (!tokens[tokens.length - 1].equals("ENDFOR")) {
             // Check for syntax errors in the for loop command
             System.err.println("Syntax error: " + String.join(" ", tokens)); // Print syntax error message
             key = false; // Disable further parsing
             return; // Exit method
-        }
+        } 
 
         int iterations;
         try {
             // Parse the number of iterations from the second token
             iterations = Integer.parseInt(tokens[1]);
         } catch (NumberFormatException e) {
-            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
+            System.err.println("RUNTIME ERROR: Invalid loop iteration count at line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
             return; // Exit method
         }
-
+        
         // Start iterating over the specified number of iterations
         for (int i = 0; i < iterations; i++) {
+        	String[] arr = new String[tokens.length - 4];
             // Execute the loop body
-            for (int j = 2; j < tokens.length - 1; j++) {
-                interpretLine(tokens[j]); // Interpret and execute command in the loop body
+            for (int j = 0; j < tokens.length - 4; j++) { // Start from index 3 to skip "FOR", iterations count, and the initial ";"
+                 arr[j] = tokens[j + 3];// Interpret and execute command in the loop body
             }
+            handleOperator(arr);
         }
     }
 
