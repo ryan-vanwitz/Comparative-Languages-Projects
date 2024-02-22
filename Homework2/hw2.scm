@@ -46,17 +46,27 @@
 ; Returns true if the two lists have identical structure
 ; in terms of how many elements and nested lists they have in the same order
 (define (struct lst1 lst2)
-	#t
-)
+	(cond ((and (null? lst1) (null? lst2)) #t)           
+        ((or (null? lst1) (null? lst2)) #f)           
+        ((not (list? (car lst1)))                     
+         (and (not (list? (car lst2))
+                   )               
+              (struct (cdr lst1) (cdr lst2))))       
+        ((not (list? (car lst2)))#f)               
+        (else (and (struct (car lst1) (car lst2))     
+                   (struct (cdr lst1) (cdr lst2))))
+        )
+  )
 
 (line "struct")
 (mydisplay (struct '(a b c (c a b)) '(1 2 3 (a b c))))  ; -> #t
 (mydisplay (struct '(a b c d (c a b)) '(1 2 3 (a b c))))  ; -> #f
 (mydisplay (struct '(a b c (c a b)) '(1 2 3 (a b c) 0)))  ; -> #f
+
 (line "struct")
 ; ---------------------------------------------
 
-; Returns a list of two numeric values. The first is the smallest
+; Returns a list of two numeric values. The first is the smallest 
 ; in the list and the second is the largest in the list. 
 ; lst -- contains numeric values, and length is >= 1.
 (define (minAndMax lst)
