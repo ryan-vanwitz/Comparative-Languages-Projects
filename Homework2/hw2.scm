@@ -89,8 +89,13 @@
 ; that are inside nested loops taken out. So we want to flatten all elements and have
 ; them all in a single list. For example '(a (a a) a))) should become (a a a a)
 (define (flatten lst)
-	'()
-)
+  (cond ((null? lst) '())                      
+        ((not (pair? lst)) (list lst))         
+        (else (append (flatten (car lst))
+                      (flatten (cdr lst)))
+         )
+    )
+ )
 
 (line "flatten")
 (mydisplay (flatten '(a b c)))  ; -> (a b c)
