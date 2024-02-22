@@ -70,8 +70,14 @@
 ; in the list and the second is the largest in the list. 
 ; lst -- contains numeric values, and length is >= 1.
 (define (minAndMax lst)
-	'()
-)
+(let ((min (car lst)) 
+        (max (car lst)))
+    (for-each (lambda (x) 
+                (when (< x min) (set! min x)) 
+                (when (> x max) (set! max x)))
+              (cdr lst))
+    (list min max))
+ )
 
 (line "minAndMax")
 (mydisplay (minAndMax '(1 2 -3 4 2)))  ; -> (-3 4)
