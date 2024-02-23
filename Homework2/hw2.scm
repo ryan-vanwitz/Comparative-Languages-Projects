@@ -24,6 +24,9 @@
 )
 
 ; ================ Solve the following functions ===================
+;
+; Copyright (c) 2024 Ryan Van Witzenburg and ChatGPT. All rights reserved.
+;
 ; Return a list with only the negatives items
 (define (negatives lst)
     (if (null? lst)
@@ -257,8 +260,19 @@
 ; filters -- list of predicates to apply to the individual elements
 
 (define (filterList lst filters)
-	(if equal? (cadd lst)(POS?)
-)
+  (if (null? filters)
+      lst
+      (filterList (manipulateList lst (car filters)) (cdr filters))
+   )
+ )
+
+(define (manipulateList lst predicate)
+  (cond ((null? lst) '())
+        ((predicate (car lst))
+         (cons (car lst) (manipulateList (cdr lst) predicate)))
+        (else (manipulateList (cdr lst) predicate))
+     )
+ )
 
 (line "filterList")
 (mydisplay (filterList '(1 2 3 11 22 33 -1 -2 -3 -11 -22 -33) (list POS?)))
