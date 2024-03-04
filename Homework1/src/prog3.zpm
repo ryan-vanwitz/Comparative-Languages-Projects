@@ -1,0 +1,3 @@
+A = -4 ;
+FOR 2 A += 1 ; ENDFOR
+PRINT A ;

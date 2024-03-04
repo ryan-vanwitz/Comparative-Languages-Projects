@@ -114,15 +114,22 @@ public class Parser {
      * @param tokens   the tokens representing the assignment command
      */
     private void handleAssignment(String variable, String value, String[] tokens) {
-        try {
-            // Attempt to parse the value as an integer
-            int intValue = Integer.parseInt(value);
-            // If successful, store as integer
-            variables.put(variable, intValue);
-        } catch (NumberFormatException e) {
-            // If parsing as integer fails, store as string
-            variables.put(variable, value);
-        }
+    	 // System.out.println("Variable: " + variable + ", Value: " + value);
+    	 try {
+    	        // Attempt to parse the value as an integer
+    	        int intValue;
+    	        if (value.startsWith("-")) {
+    	            intValue = Integer.parseInt(value.substring(1)); // Parse without the negative sign
+    	            intValue *= -1; // Adjust the parsed value to be negative
+    	        } else {
+    	            intValue = Integer.parseInt(value);
+    	        }
+    	        // Store the parsed value
+    	        variables.put(variable, intValue);
+    	    } catch (NumberFormatException e) {
+    	        // If parsing as integer fails, store as string
+    	        variables.put(variable, value);
+    	    }
     }
 
     /**
@@ -210,10 +217,10 @@ public class Parser {
         
         // Start iterating over the specified number of iterations
         for (int i = 0; i < iterations; i++) {
-        	String[] arr = new String[tokens.length - 4];
+        	String[] arr = new String[tokens.length - 3];
             // Execute the loop body
-            for (int j = 0; j < tokens.length - 4; j++) { // Start from index 3 to skip "FOR", iterations count, and the initial ";"
-                 arr[j] = tokens[j + 3];// Interpret and execute command in the loop body
+            for (int j = 0; j < tokens.length - 3; j++) { // Start from index 3 to skip "FOR", iterations count, and the initial ";"
+                 arr[j] = tokens[j + 2];// Interpret and execute command in the loop body
             }
             handleOperator(arr);
         }
@@ -262,8 +269,11 @@ public class Parser {
      * @return the parsed value
      */
     private Object parseVariable(String value) {
-        try {
-            if(isInteger(value)) { // Check if the value is an integer
+    	try {
+            if (value.startsWith("-")) {
+                // If the value starts with a negative sign, parse the substring excluding the negative sign
+                return Integer.parseInt(value.substring(1)) * -1;
+            } else if(isInteger(value)) { // Check if the value is an integer
                 return Integer.parseInt(value); // Parse and return integer value
             } else {
                 if (value.startsWith("\"") && value.endsWith("\"") && value.length() >= 2) {
