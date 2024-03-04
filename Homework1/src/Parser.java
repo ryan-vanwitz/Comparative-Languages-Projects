@@ -210,7 +210,7 @@ public class Parser {
             // Parse the number of iterations from the second token
             iterations = Integer.parseInt(tokens[1]);
         } catch (NumberFormatException e) {
-            System.err.println("RUNTIME ERROR: Invalid loop iteration count at line " + numberOfLine); // Print error message
+            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
             return; // Exit method
         }
