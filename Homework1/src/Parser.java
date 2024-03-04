@@ -9,7 +9,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -210,19 +212,20 @@ public class Parser {
             // Parse the number of iterations from the second token
             iterations = Integer.parseInt(tokens[1]);
         } catch (NumberFormatException e) {
-            System.err.println("RUNTIME ERROR: line " + numberOfLine); // Print error message
+            System.err.println("RUNTIME ERROR: Invalid loop iteration count at line " + numberOfLine); // Print error message
             key = false; // Disable further parsing
             return; // Exit method
         }
         
-        // Start iterating over the specified number of iterations
+        // Iterate over parameters for the specified number of iterations
+        int j = 2; // Start index for parameters
         for (int i = 0; i < iterations; i++) {
-        	String[] arr = new String[tokens.length - 3];
-            // Execute the loop body
-            for (int j = 0; j < tokens.length - 3; j++) { // Start from index 3 to skip "FOR", iterations count, and the initial ";"
-                 arr[j] = tokens[j + 2];// Interpret and execute command in the loop body
+            while (j < tokens.length - 1) { // Iterate until the end of the tokens
+                String parameter = tokens[j] + " " + tokens[j+1] + " " + tokens[j+2] + " " + tokens[j+3]; // Construct parameter string
+                interpretLine(parameter.trim()); // Interpret and execute the parameter
+                j += 4; // Move to the next parameter
             }
-            handleOperator(arr);
+            j = 2; // Reset index for parameters
         }
     }
 
