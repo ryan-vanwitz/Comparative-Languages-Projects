@@ -6,9 +6,8 @@
 % Determine the Maximum of two int numbers
 % maxnums(A, B, MAX).
 
-maxnums(A, B, MAX) :- MAX is A, A > B;  MAX is B, B >= A.
-
-% maxnums(A, B, MAX) :- A > B, MAX is A; B >= A, MAX is B.
+% maxnums(A, B, MAX) :- MAX is A, A > B;  MAX is B, B >= A.
+maxnums(A, B, MAX) :- A > B, MAX is A; B >= A, MAX is B.
 
 % maxnums(-12, 12, MAX). -> MAX = 12
 % maxnums(11232, 92674, MAX). -> MAX = 92674
@@ -18,6 +17,8 @@ maxnums(A, B, MAX) :- MAX is A, A > B;  MAX is B, B >= A.
 % Determine the summation of a list of integer numbers
 % sum(LST, SUM).
 
+sum([], 0).
+sum([H|T], SUM) :- sum(T, Rest), SUM is Rest + H.
 
 % sum([1, 2, 3, 4], SUM). -> SUM = 10
 % sum([10, -10], SUM). -> SUM = 0
@@ -29,6 +30,7 @@ maxnums(A, B, MAX) :- MAX is A, A > B;  MAX is B, B >= A.
 %    as part of your solution.
 % ** You can always assume that the given LST is not empty. 
 % max(LST, MAX).
+
 
 
 % max([-5, -5, -5], MAX). -> MAX = -5
