@@ -31,7 +31,8 @@ sum([H|T], SUM) :- sum(T, Rest), SUM is Rest + H.
 % ** You can always assume that the given LST is not empty. 
 % max(LST, MAX).
 
-
+max([H], H).
+max([H|T], MAX) :- max(T, Rest), maxnums(H, Rest, MAX).
 
 % max([-5, -5, -5], MAX). -> MAX = -5
 % max([1], MAX). -> MAX = 1
