@@ -6,7 +6,6 @@
 % Determine the Maximum of two int numbers
 % maxnums(A, B, MAX).
 
-% maxnums(A, B, MAX) :- MAX is A, A > B;  MAX is B, B >= A.
 maxnums(A, B, MAX) :- A > B, MAX is A; B >= A, MAX is B.
 
 % maxnums(-12, 12, MAX). -> MAX = 12
@@ -31,7 +30,7 @@ sum([H|T], SUM) :- sum(T, Rest), SUM is Rest + H.
 % ** You can always assume that the given LST is not empty. 
 % max(LST, MAX).
 
-max([H], H).
+max([H], H) :- !.
 max([H|T], MAX) :- max(T, Rest), maxnums(H, Rest, MAX).
 
 % max([-5, -5, -5], MAX). -> MAX = -5
@@ -60,8 +59,8 @@ partitionable([H|T]) :- partitionable(T|Rest), sum(H, SUM), mod(SUM,2) =:= 0.
 % list of integer numbers
 % elementExist(E, LST).
 
-% elementExist(_, []).
-elementExist(E, [E|_]).
+% elementExist(_, []) :- !.
+elementExist(E, [E|_]) :- !.
 elementExist(E, [_|T]) :- elementExist(E, T).
 
 % elementExist(1, [1, 2, 3]). -> true.
@@ -84,6 +83,9 @@ reverse([H|T], Rev) :- reverse(T, RevList), append(RevList, [H], Rev).
 % Determine the list of integer numbers that are only one digit numbers
 % collectOneDigits(LST, NEWLST). 
 
+collectOneDigits([], []).
+collectOneDigits([X|Xs], [X|NewXs]) :- X > -10, X < 10, !, collectOneDigits(Xs, NewXs).
+collectOneDigits([_|Xs], NewXs) :- collectOneDigits(Xs, NewXs). 
 
 % collectOneDigits([10, 90, -20], NEWLST). -> NEWLST = []
 % collectOneDigits([], NEWLST). -> NEWLST = []
