@@ -100,6 +100,7 @@ collectOneDigits([_|Xs], NewXs) :- collectOneDigits(Xs, NewXs).
 % Determine all places based on given state and zipcode.
 % getStateInfo(PLACE, STATE< ZIPCODE).
 
+getStateInfo(Place, State, Zipcode) :- location(Zipcode, Place, State, _, _, _).
 
 % getStateInfo('Oxford', State, 45056). -> State = 'OH'
 % getStateInfo('Oxford', State, _). -> 
