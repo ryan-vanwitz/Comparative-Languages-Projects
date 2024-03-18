@@ -45,6 +45,8 @@ max([H|T], MAX) :- max(T, Rest), maxnums(H, Rest, MAX).
 % ** You can always assume that the given LST is not empty. 
 % partitionable(LST).
 
+% ChatGPT aided in creation of this rule 
+
 partitionable([]) :- !.
 partitionable(LST) :- append(L1, L2, LST), sum(L1, SUM), sum(L2, SUM), !.
 
@@ -60,7 +62,8 @@ partitionable(LST) :- append(L1, L2, LST), sum(L1, SUM), sum(L2, SUM), !.
 % list of integer numbers
 % elementExist(E, LST).
 
-% elementExist(_, []) :- !.
+% ChatGPT aided in creation of this rule 
+
 elementExist(E, [E|_]) :- !.
 elementExist(E, [_|T]) :- elementExist(E, T).
 
@@ -71,6 +74,8 @@ elementExist(E, [_|T]) :- elementExist(E, T).
 % #6 (Undergraduate/Graduate) (5/5 pts)
 % Determine the reverse list of integer numbers
 % reverse(LST, REVLST).
+
+% ChatGPT aided in creation of this rule 
 
 reverse([], []). 
 reverse([H|T], Rev) :- reverse(T, RevList), append(RevList, [H], Rev).
@@ -83,6 +88,8 @@ reverse([H|T], Rev) :- reverse(T, RevList), append(RevList, [H], Rev).
 % #7 (Undergraduate/Graduate) (5/5 pts)
 % Determine the list of integer numbers that are only one digit numbers
 % collectOneDigits(LST, NEWLST). 
+
+% ChatGPT aided in creation of this rule 
 
 collectOneDigits([], []).
 collectOneDigits([X|Xs], [X|NewXs]) :- X > -10, X < 10, !, collectOneDigits(Xs, NewXs).
@@ -147,14 +154,9 @@ getStateInfo(Place, State, Zipcode) :- location(Zipcode, Place, State, _, _, _).
 %    practice. 
 % getCommon(STATE1, STATE2, PLACELST).
 
-getCommon(STATE1, STATE2, PLACELST) :- collectPlaces(STATE1, Places1), collectPlaces(STATE2, Places2), append(Places1, Places2, AllPlaces), removeDuplicates(AllPlaces, PLACELST).
+% ChatGPT aided in creation of this rule 
 
-removeDuplicates([], []).
-removeDuplicates([X|Xs], [X|Result]) :- subtract(Xs, [X], NewXs), removeDuplicates(NewXs, Result).
-
-subtract([], _, []).
-subtract([X|Xs], L2, Diff) :- member(X, L2), !, subtract(Xs, L2, Diff).
-subtract([X|Xs], L2, [X|Diff]) :- subtract(Xs, L2, Diff).
+getCommon(STATE1, STATE2, PLACELST) :- collectPlaces(STATE1, Places1), collectPlaces(STATE2, Places2), intersection(Places1, Places2, AllCommonPlaces),  sort(AllCommonPlaces, PLACELST).
 
 collectPlaces(State, Places) :- findall(Place, location(_, Place, State, _, _, _), Places).
 
@@ -184,7 +186,7 @@ collectPlaces(State, Places) :- findall(Place, location(_, Place, State, _, _, _
 % ndee','Marysville','Ray','Franklin','Mason','Lowell','Newport','
 % Waterford','Sterling','Portage','Wayne','Grand Rapids','Weston']
 % 
-% getCommon(S1,'MI',PLACELST).  -> S1 = 'OH'
+% DO NOT CONSIDER: getCommon(S1,'MI',PLACELST).  -> S1 = 'OH'
 % Assuming the PLACELIST is holding the result from the previous query
 % ------------------------------------------------
 % #10 ( -- /Graduate) (0/10 pts)
