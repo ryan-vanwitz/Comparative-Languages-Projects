@@ -45,8 +45,9 @@ max([H|T], MAX) :- max(T, Rest), maxnums(H, Rest, MAX).
 % ** You can always assume that the given LST is not empty. 
 % partitionable(LST).
 
-partitionable([H]).
-partitionable([H|T]) :- partitionable(T|Rest), sum(H, SUM), mod(SUM,2) =:= 0.
+partitionable([]) :- !.
+partitionable(LST) :- append(L1, L2, LST), sum(L1, SUM), sum(L2, SUM), !.
+
 
 % partitionable([1, 2, 3, 4, 10]). -> true. because [10, 10]
 % partitionable([2, 1, 1]). -> true. because [2, 2]
@@ -144,8 +145,18 @@ getStateInfo(Place, State, Zipcode) :- location(Zipcode, Place, State, _, _, _).
 %    from Prolog library. Being able to learn something
 %    about a new programming language on your own is a skil that takes
 %    practice. 
-% getCcommon(STATE1, STATE2, PLACELST).
+% getCommon(STATE1, STATE2, PLACELST).
 
+getCommon(STATE1, STATE2, PLACELST) :- collectPlaces(STATE1, Places1), collectPlaces(STATE2, Places2), append(Places1, Places2, AllPlaces), removeDuplicates(AllPlaces, PLACELST).
+
+removeDuplicates([], []).
+removeDuplicates([X|Xs], [X|Result]) :- subtract(Xs, [X], NewXs), removeDuplicates(NewXs, Result).
+
+subtract([], _, []).
+subtract([X|Xs], L2, Diff) :- member(X, L2), !, subtract(Xs, L2, Diff).
+subtract([X|Xs], L2, [X|Diff]) :- subtract(Xs, L2, Diff).
+
+collectPlaces(State, Places) :- findall(Place, location(_, Place, State, _, _, _), Places).
 
 % getCommon('OH','MI',PLACELST). -> *Should be 131 unique plcase* 
 % ['Manchester','Unionville','Athens','Saint
