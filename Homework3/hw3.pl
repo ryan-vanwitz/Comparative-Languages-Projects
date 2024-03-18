@@ -1,5 +1,5 @@
 % hw3.pl
-% Ryan Van Witzenburg
+% Ryan Van Witzenburg and ChatGPT
 
 % ------------------------------------------------
 % #1 (Undergraduate/Graduate) (5/5 pts)
