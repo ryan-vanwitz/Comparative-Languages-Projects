@@ -43,6 +43,8 @@ public class Hw4
 
     GenerateCommonCityNamesFile();
 
+    GenerateLatLonFile();
+
 
     // Capture the end time
     DateTime endTime = DateTime.Now;
@@ -214,6 +216,84 @@ public class Hw4
     {
       Console.WriteLine($"An error occurred: {ex.Message}");
     }
+  }
+
+
+  public static void GenerateLatLonFile()
+  {
+    // Read the list of zip codes from zips.txt
+    List<string> zipCodes = File.ReadAllLines("zips.txt").ToList();
+
+    // Create a dictionary to store latitude and longitude for each zip code
+    Dictionary<string, Tuple<double, double>> latLonMap = new Dictionary<string, Tuple<double, double>>();
+
+    // Read zip code data from zipcodes.txt and populate the dictionary
+    using (StreamReader sr = new StreamReader("zipcodes.txt"))
+    {
+      string line;
+      while ((line = sr.ReadLine()) != null)
+      {
+        string[] fields = line.Split(new char[] { '\t' }, StringSplitOptions.None);
+
+        // Debugging output
+        // Console.WriteLine($"Fields array length: {fields.Length}");
+        //Console.WriteLine($"Line: {line}");
+
+        try
+        {
+          string zipCode = fields[1]; // Assuming zip code is at index 1
+          double latitude = 0.0;
+          double longitude = 0.0;
+
+          // Check if latitude and longitude fields are present and parse them
+          if (fields.Length > 6)
+          {
+            double.TryParse(fields[6], out latitude);
+          }
+          if (fields.Length > 7)
+          {
+            double.TryParse(fields[7], out longitude);
+          }
+
+          // If the zip code is not already in the dictionary and latitude/longitude are valid, add it
+          if (!latLonMap.ContainsKey(zipCode) && latitude != 0.0 && longitude != 0.0)
+          {
+            latLonMap.Add(zipCode, new Tuple<double, double>(latitude, longitude));
+          }
+        }
+        catch (FormatException ex)
+        {
+          Console.WriteLine($"Error parsing latitude or longitude: {ex.Message}");
+          Console.WriteLine($"Line content: {line}");
+        }
+      }
+    }
+
+    // Create or overwrite LatLon.txt and write the latitude and longitude for each zip code
+    using (StreamWriter sw = new StreamWriter("LatLon.txt"))
+    {
+      foreach (string zipCode in zipCodes)
+      {
+        // Check if the zip code exists in the dictionary
+        if (latLonMap.ContainsKey(zipCode))
+        {
+          // Get the latitude and longitude for the zip code
+          Tuple<double, double> latLon = latLonMap[zipCode];
+          double latitude = latLon.Item1;
+          double longitude = latLon.Item2;
+
+          // Write the zip code, latitude, and longitude to the file
+          sw.WriteLine($"{zipCode} {latitude} {longitude}");
+        }
+        else
+        {
+          // If the zip code does not have corresponding latitude and longitude, write an error message
+          sw.WriteLine($"Error: Latitude and longitude not found for {zipCode}");
+        }
+      }
+    }
+
+    Console.WriteLine("LatLon.txt generated successfully.");
   }
 
 }
