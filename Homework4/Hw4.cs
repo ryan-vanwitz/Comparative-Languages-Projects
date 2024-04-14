@@ -166,7 +166,7 @@ public class Hw4
           if (state1 == state2)
             continue;
 
-          Console.WriteLine($"Processing cities for {state1} and {state2}");
+          // Console.WriteLine($"Processing cities for {state1} and {state2}");
 
           // Read the file containing zip codes data for the current state
           string filePath = "zipcodes.txt";
@@ -321,10 +321,12 @@ public class Hw4
             string city = fields[3].Trim(); // Assuming city name is at index 3
             string state = fields[4].Trim(); // Assuming state name is at index 4
 
+            // Console.WriteLine($"Read City: {city}, State: {state}");
+
             // Check if the city is in the list of cities we're interested in
-            if (cities.Contains(city))
+            if (cities.Any(c => c.Equals(city, StringComparison.OrdinalIgnoreCase)))
             {
-              Console.WriteLine($"City: {city}, State: {state}");
+              // Console.WriteLine($"City: {city}, State: {state}");
               // Add the state to the city's set of states
               if (!cityStateMap.ContainsKey(city))
               {
