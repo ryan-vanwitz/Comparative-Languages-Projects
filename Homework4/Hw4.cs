@@ -14,7 +14,7 @@ public class Hw4
     // Main method
     // ============================
 
-    List<Zipcode> zipcodes = new List<Zipcode>();
+    List<Zipcode> zipcodesList = new List<Zipcode>();
     string filePath = "zipcodes.txt"; // Update with the correct file path
     int insufficientFieldCount = 0; // Track the number of times insufficient fields occur
 
@@ -24,30 +24,50 @@ public class Hw4
       {
         string line;
         int lineNumber = 0;
+
+        // Skip the header line
+        sr.ReadLine();
+        lineNumber++;
+
         while ((line = sr.ReadLine()) != null)
         {
           lineNumber++;
-          // Split the line by tab delimiter
-          string[] fields = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
-          // Check if the line has enough fields
-          if (fields.Length < 20)
+          // Split the line by tab delimiter
+          string[] parsedFields = line.Split(new char[] { '\t' }, StringSplitOptions.None);
+
+          // Initialize fields array with correct size and set all elements to null
+          string[] fields = new string[20];
+          for (int i = 0; i < fields.Length; i++)
+          {
+            fields[i] = null;
+          }
+
+          // Copy parsed fields into the fields array
+          for (int i = 0; i < parsedFields.Length && i < fields.Length; i++)
+          {
+            fields[i] = parsedFields[i];
+          }
+
+          // Check if the line has insufficient fields
+          if (parsedFields.Length < 20)
           {
             insufficientFieldCount++;
-            // Print error message for the first few occurrences only
-            if (insufficientFieldCount <= 10)
-            {
-              Console.WriteLine($"Error: Insufficient fields in line {lineNumber}: '{line}'");
-            }
-            else if (insufficientFieldCount == 11)
-            {
-              Console.WriteLine("Too many lines with insufficient fields. Further occurrences will not be displayed.");
-            }
-            continue; // Skip processing this line further
+            continue; // Skip this line and proceed to the next one
           }
 
           try
           {
+            double latitude, longitude;
+
+            // Try parsing latitude and longitude
+            if (!double.TryParse(fields[6], out latitude) || !double.TryParse(fields[7], out longitude))
+            {
+              // Skip this line if latitude or longitude parsing fails
+              Console.WriteLine($"Skipping line {lineNumber}: '{line}' due to invalid latitude or longitude.");
+              continue;
+            }
+
             // Parse fields and create Zipcode object
             Zipcode zipcode = new Zipcode(
                 int.Parse(fields[0]),
@@ -72,7 +92,10 @@ public class Hw4
                 fields[19]
             );
             // Add zipcode to list
-            zipcodes.Add(zipcode);
+            zipcodesList.Add(zipcode);
+
+            // Print the created Zipcode object
+            // Console.WriteLine($"Created Zipcode: {zipcode}");
           }
           catch (Exception ex)
           {
@@ -87,9 +110,9 @@ public class Hw4
     }
 
     // Display the first 10 zipcodes for demonstration
-    for (int i = 0; i < 10 && i < zipcodes.Count; i++)
+    for (int i = 0; i < 10 && i < zipcodesList.Count; i++)
     {
-      Console.WriteLine(zipcodes[i]);
+      Console.WriteLine(zipcodesList[i]);
     }
 
     // Display the total number of lines with insufficient fields
@@ -97,11 +120,6 @@ public class Hw4
     {
       Console.WriteLine($"Total lines with insufficient fields: {insufficientFieldCount}");
     }
-
-    // ============================
-    // Do not add or change anything below, inside the 
-    // Main method
-    // ============================
 
     // Capture the end time
     DateTime endTime = DateTime.Now;
