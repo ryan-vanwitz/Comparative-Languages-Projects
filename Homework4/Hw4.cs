@@ -145,52 +145,74 @@ public class Hw4
 
   public static void GenerateCommonCityNamesFile()
   {
-    // Read the list of states from states.txt
-    List<string> states = File.ReadAllLines("states.txt").ToList();
-
-    // Create a HashSet to store common city names
-    HashSet<string> commonCityNames = new HashSet<string>();
-
-    // Iterate through each state to find common city names
-    foreach (string state in states)
+    try
     {
-      Console.WriteLine($"Processing state: {state}");
+      // Read the list of states from states.txt
+      List<string> states = File.ReadAllLines("states.txt").ToList();
 
-      // Read the file containing zip codes data for the current state
-      string filePath = "zipcodes.txt";
-      if (File.Exists(filePath))
+      // Create a HashSet to store common city names
+      HashSet<string> commonCityNames = new HashSet<string>();
+
+      // Iterate through each state to find common city names
+      foreach (string state1 in states)
       {
-        // Read city names from the current state's file
-        List<string> cities = File.ReadAllLines(filePath)
-                                    .Select(line => line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries)[3].Trim())
-                                    //.Where(city => string.Equals(city, state, StringComparison.OrdinalIgnoreCase)) // Filter city names matching the current state
-                                    .ToList();
-
-        Console.WriteLine($"Cities for state {state}: {string.Join(", ", cities)}");
-
-        if (commonCityNames.Count == 0)
+        foreach (string state2 in states)
         {
-          // First state, add all cities to the common set
-          commonCityNames.UnionWith(cities);
-        }
-        else
-        {
-          // Remove cities that are not common in this state
-          commonCityNames.IntersectWith(cities);
+          // Skip if both states are the same
+          if (state1 == state2)
+            continue;
+
+          Console.WriteLine($"Processing cities for {state1} and {state2}");
+
+          // Read the file containing zip codes data for the current state
+          string filePath = "zipcodes.txt";
+          if (File.Exists(filePath))
+          {
+            // Read city names from the current state's file
+            List<string> cities1 = File.ReadAllLines(filePath)
+                                        .Where(line => line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries)[4].Trim().Equals(state1, StringComparison.OrdinalIgnoreCase))
+                                        .Select(line => line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries)[3].Trim())
+                                        .ToList();
+
+            List<string> cities2 = File.ReadAllLines(filePath)
+                                        .Where(line => line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries)[4].Trim().Equals(state2, StringComparison.OrdinalIgnoreCase))
+                                        .Select(line => line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries)[3].Trim())
+                                        .ToList();
+
+            // Find common cities between the two states
+            IEnumerable<string> commonCities = cities1.Intersect(cities2);
+
+            //Console.WriteLine($"Common cities between {state1} and {state2}: {string.Join(", ", commonCities)}");
+
+            if (commonCityNames.Count == 0)
+            {
+              // First state pair, add all common cities to the common set
+              commonCityNames.UnionWith(commonCities);
+            }
+            else
+            {
+              // Remove cities that are not common in this state pair
+              commonCityNames.IntersectWith(commonCities);
+            }
+          }
         }
       }
+
+      // Sort the common city names alphabetically
+      List<string> sortedCommonCityNames = commonCityNames.OrderBy(city => city).ToList();
+
+      // Output the common city names to CommonCityNames.txt
+      File.WriteAllLines("CommonCityNames.txt", sortedCommonCityNames);
+
+      /* Console.WriteLine("Common city names written to CommonCityNames.txt:");
+       foreach (var city in sortedCommonCityNames)
+       {
+         Console.WriteLine(city);
+       } */
     }
-
-    // Sort the common city names alphabetically
-    List<string> sortedCommonCityNames = commonCityNames.OrderBy(city => city).ToList();
-
-    // Output the common city names to CommonCityNames.txt
-    File.WriteAllLines("CommonCityNames.txt", sortedCommonCityNames);
-
-    Console.WriteLine("Common city names written to CommonCityNames.txt:");
-    foreach (var city in sortedCommonCityNames)
+    catch (Exception ex)
     {
-      Console.WriteLine(city);
+      Console.WriteLine($"An error occurred: {ex.Message}");
     }
   }
 
