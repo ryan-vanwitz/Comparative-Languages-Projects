@@ -45,6 +45,8 @@ public class Hw4
 
     GenerateLatLonFile();
 
+    GenerateCityStatesFile();
+
 
     // Capture the end time
     DateTime endTime = DateTime.Now;
@@ -294,6 +296,65 @@ public class Hw4
     }
 
     Console.WriteLine("LatLon.txt generated successfully.");
+  }
+
+  public static void GenerateCityStatesFile()
+  {
+    try
+    {
+      // Read the list of cities from cities.txt
+      List<string> cities = File.ReadAllLines("cities.txt").ToList();
+      Console.WriteLine($"Cities from cities.txt: {string.Join(", ", cities)}");
+
+      // Create a dictionary to store states for each city
+      Dictionary<string, HashSet<string>> cityStateMap = new Dictionary<string, HashSet<string>>();
+
+      // Iterate through zip codes
+      using (StreamReader sr = new StreamReader("zipcodes.txt"))
+      {
+        string line;
+        while ((line = sr.ReadLine()) != null)
+        {
+          string[] fields = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+          if (fields.Length >= 5) // Ensure there are enough fields
+          {
+            string city = fields[3].Trim(); // Assuming city name is at index 3
+            string state = fields[4].Trim(); // Assuming state name is at index 4
+
+            // Check if the city is in the list of cities we're interested in
+            if (cities.Contains(city))
+            {
+              Console.WriteLine($"City: {city}, State: {state}");
+              // Add the state to the city's set of states
+              if (!cityStateMap.ContainsKey(city))
+              {
+                cityStateMap[city] = new HashSet<string>();
+              }
+              cityStateMap[city].Add(state);
+            }
+          }
+        }
+      }
+
+      // Create or overwrite CityStates.txt and write the states for each city
+      using (StreamWriter sw = new StreamWriter("CityStates.txt"))
+      {
+        foreach (string city in cityStateMap.Keys)
+        {
+          // Get the states for the city and sort them alphabetically
+          List<string> states = cityStateMap[city].OrderBy(s => s).ToList();
+
+          // Write the city and its states to the file
+          sw.WriteLine($"{city}\t{string.Join(" ", states)}");
+        }
+      }
+
+      Console.WriteLine("CityStates.txt generated successfully.");
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"An error occurred: {ex.Message}");
+    }
   }
 
 }
