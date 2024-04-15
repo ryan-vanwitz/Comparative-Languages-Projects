@@ -55,4 +55,44 @@ public class Zipcode
     {
         return $"{RecordNumber}\t{Code}\t{ZipCodeType}\t{City}\t{State}\t{LocationType}\t{Lat}\t{Long}\t{Xaxis}\t{Yaxis}\t{Zaxis}\t{WorldRegion}\t{Country}\t{LocationText}\t{Location}\t{Decommissioned}\t{TaxReturnsFiled}\t{EstimatedPopulation}\t{TotalWages}\t{Notes}";
     }
+
+    // Override the ">" operator to compare two Zipcode objects based on their zip codes
+    public static Zipcode operator >(Zipcode zip1, Zipcode zip2)
+    {
+        // Check if either zip1 or zip2 is null
+        if (zip1 == null)
+        {
+            return zip2;
+        }
+        if (zip2 == null)
+        {
+            return zip1;
+        }
+
+        // Compare zip codes
+        int result = string.Compare(zip1.Code, zip2.Code);
+
+        // Return the Zipcode object with the larger zip code number
+        return result > 0 ? zip1 : zip2;
+    }
+
+    // Override the "<" operator to compare two Zipcode objects based on their zip codes
+    public static Zipcode operator <(Zipcode zip1, Zipcode zip2)
+    {
+        // Check if either zip1 or zip2 is null
+        if (zip1 == null)
+        {
+            return zip2;
+        }
+        if (zip2 == null)
+        {
+            return zip1;
+        }
+
+        // Compare zip codes
+        int result = string.Compare(zip1.Code, zip2.Code);
+
+        // Return the Zipcode object with the smaller zip code number
+        return result < 0 ? zip1 : zip2;
+    }
 }

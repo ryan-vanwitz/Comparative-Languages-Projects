@@ -29,18 +29,6 @@ public class Hw4
       Console.WriteLine("Error reading the file: " + e.Message);
     }
 
-    // Display the first 10 zipcodes for demonstration
-    for (int i = 0; i < 10 && i < zipcodesList.Count; i++)
-    {
-      Console.WriteLine(zipcodesList[i]);
-    }
-
-    // Display the total number of lines with insufficient fields
-    if (insufficientFieldCount > 0)
-    {
-      // Console.WriteLine($"Total lines with insufficient fields: {insufficientFieldCount}");
-    }
-
     GenerateCommonCityNamesFile();
 
     GenerateLatLonFile();
@@ -92,7 +80,7 @@ public class Hw4
         }
 
         // Check if the line has insufficient fields
-        if (parsedFields.Length < 10000000)
+        if (parsedFields.Length < 100)
         {
           insufficientFieldCount++;
           continue; // Skip this line and proceed to the next one
@@ -137,7 +125,7 @@ public class Hw4
           zipcodesList.Add(zipcode);
 
           // Print the created Zipcode object
-          Console.WriteLine($"Created Zipcode: {zipcode}");
+          // Console.WriteLine($"Created Zipcode: {zipcode}");
         }
         catch (Exception ex)
         {
@@ -217,6 +205,9 @@ public class Hw4
          {
            Console.WriteLine(city);
          } */
+
+      Console.WriteLine("CommonCityNames.txt generated successfully.");
+
     }
     catch (Exception ex)
     {
@@ -331,7 +322,7 @@ public class Hw4
     {
       // Read the list of cities from cities.txt
       List<string> cities = File.ReadAllLines("cities.txt").ToList();
-      Console.WriteLine($"Cities from cities.txt: {string.Join(", ", cities)}");
+      // Console.WriteLine($"Cities from cities.txt: {string.Join(", ", cities)}");
 
       // Create a dictionary to store states for each city
       Dictionary<string, HashSet<string>> cityStateMap = new Dictionary<string, HashSet<string>>();
