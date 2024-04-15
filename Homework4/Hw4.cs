@@ -374,7 +374,7 @@ public class Hw4
           List<string> states = cityStateMap[city].OrderBy(s => s).ToList();
 
           // Write the city and its states to the file
-          sw.WriteLine($"{city}\t{string.Join(" ", states)}");
+          sw.WriteLine($"{string.Join(" ", states)}");
         }
       }
 
