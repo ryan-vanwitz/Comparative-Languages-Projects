@@ -3,9 +3,11 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
+using words = System.String;
+
 public class Hw4
 {
-  public static void Main(string[] args)
+  public static void Main(words[] args)
   {
     // Capture the start time
     DateTime startTime = DateTime.Now;
@@ -29,6 +31,8 @@ public class Hw4
       Console.WriteLine("Error reading the file: " + e.Message);
     }
 
+
+
     GenerateCommonCityNamesFile();
 
     GenerateLatLonFile();
@@ -46,7 +50,7 @@ public class Hw4
     Console.WriteLine($"Elapsed Time: {elapsedTime.TotalMilliseconds} ms");
   }
 
-  private static void ParseZipcodesFromFile(string filePath, List<Zipcode> zipcodesList, out int insufficientFieldCount)
+  private unsafe static void ParseZipcodesFromFile(string filePath, List<Zipcode> zipcodesList, out int insufficientFieldCount)
   {
     insufficientFieldCount = 0;
 
@@ -63,74 +67,149 @@ public class Hw4
       {
         lineNumber++;
 
-        // Split the line by tab delimiter
-        string[] parsedFields = line.Split(new char[] { '\t' }, StringSplitOptions.None);
-
-        // Initialize fields array with correct size and set all elements to null
-        string[] fields = new string[20];
-        for (int i = 0; i < fields.Length; i++)
+        // Use unsafe context for pointer manipulation
+        fixed (char* linePtr = line)
         {
-          fields[i] = null;
-        }
+          char* ptr = linePtr;
 
-        // Copy parsed fields into the fields array
-        for (int i = 0; i < parsedFields.Length && i < fields.Length; i++)
-        {
-          fields[i] = parsedFields[i];
-        }
+          // Initialize variables to store field values
+          int recordNumber = 0;
+          string code = null;
+          string zipCodeType = null;
+          string city = null;
+          string state = null;
+          string locationType = null;
+          double lat = 0.0;
+          double longitude = 0.0;
+          double xaxis = 0.0;
+          double yaxis = 0.0;
+          double zaxis = 0.0;
+          string worldRegion = null;
+          string country = null;
+          string locationText = null;
+          string location = null;
+          bool decommissioned = false;
+          int taxReturnsFiled = 0;
+          int estimatedPopulation = 0;
+          int totalWages = 0;
+          string notes = null;
 
-        // Check if the line has insufficient fields
-        if (parsedFields.Length < 100)
-        {
-          insufficientFieldCount++;
-          continue; // Skip this line and proceed to the next one
-        }
-
-        try
-        {
-          double latitude, longitude;
-
-          // Try parsing latitude and longitude
-          if (!double.TryParse(fields[6], out latitude) || !double.TryParse(fields[7], out longitude))
+          // Find the tab delimiter and extract fields
+          for (int i = 0; i < 20; i++)
           {
-            // Skip this line if latitude or longitude parsing fails
-            Console.WriteLine($"Skipping line {lineNumber}: '{line}' due to invalid latitude or longitude.");
-            continue;
+            // Find the next tab delimiter
+            while (*ptr != '\t')
+            {
+              if (*ptr == '\0') // Reached end of line before expected number of fields
+              {
+                insufficientFieldCount++;
+                goto EndOfLine;
+              }
+              ptr++;
+            }
+
+            // Replace the tab delimiter with null terminator
+            *ptr = '\0';
+
+            // Store the field's start pointer
+            char* fieldStart = linePtr;
+
+            // Move to the next character after the null terminator
+            ptr++;
+
+            // Process the field based on its position
+            switch (i)
+            {
+              case 0:
+                recordNumber = int.Parse(new string(fieldStart));
+                break;
+              case 1:
+                code = new string(fieldStart);
+                break;
+              case 2:
+                zipCodeType = new string(fieldStart);
+                break;
+              case 3:
+                city = new string(fieldStart);
+                break;
+              case 4:
+                state = new string(fieldStart);
+                break;
+              case 5:
+                locationType = new string(fieldStart);
+                break;
+              case 6:
+                double.TryParse(new string(fieldStart), out lat);
+                break;
+              case 7:
+                double.TryParse(new string(fieldStart), out longitude);
+                break;
+              case 8:
+                double.TryParse(new string(fieldStart), out xaxis);
+                break;
+              case 9:
+                double.TryParse(new string(fieldStart), out yaxis);
+                break;
+              case 10:
+                double.TryParse(new string(fieldStart), out zaxis);
+                break;
+              case 11:
+                worldRegion = new string(fieldStart);
+                break;
+              case 12:
+                country = new string(fieldStart);
+                break;
+              case 13:
+                locationText = new string(fieldStart);
+                break;
+              case 14:
+                location = new string(fieldStart);
+                break;
+              case 15:
+                bool.TryParse(new string(fieldStart), out decommissioned);
+                break;
+              case 16:
+                int.TryParse(new string(fieldStart), out taxReturnsFiled);
+                break;
+              case 17:
+                int.TryParse(new string(fieldStart), out estimatedPopulation);
+                break;
+              case 18:
+                int.TryParse(new string(fieldStart), out totalWages);
+                break;
+              case 19:
+                notes = new string(fieldStart);
+                break;
+            }
           }
 
-          // Parse other fields and create Zipcode object
+          // Create Zipcode object and add it to the list
           Zipcode zipcode = new Zipcode(
-              int.Parse(fields[0]),
-              fields[1],
-              fields[2],
-              fields[3],
-              fields[4],
-              fields[5],
-              latitude,
+              recordNumber,
+              code,
+              zipCodeType,
+              city,
+              state,
+              locationType,
+              lat,
               longitude,
-              double.Parse(fields[8]),
-              double.Parse(fields[9]),
-              double.Parse(fields[10]),
-              fields[11],
-              fields[12],
-              fields[13],
-              fields[14],
-              bool.Parse(fields[15]),
-              int.Parse(fields[16]),
-              int.Parse(fields[17]),
-              int.Parse(fields[18]),
-              fields[19]
+              xaxis,
+              yaxis,
+              zaxis,
+              worldRegion,
+              country,
+              locationText,
+              location,
+              decommissioned,
+              taxReturnsFiled,
+              estimatedPopulation,
+              totalWages,
+              notes
           );
-          // Add zipcode to list
           zipcodesList.Add(zipcode);
+        }
 
-          // Print the created Zipcode object
-          // Console.WriteLine($"Created Zipcode: {zipcode}");
-        }
-        catch (Exception ex)
-        {
-          Console.WriteLine($"Error parsing line {lineNumber}: '{line}'. {ex.Message}");
-        }
+      EndOfLine:;
       }
     }
   }
