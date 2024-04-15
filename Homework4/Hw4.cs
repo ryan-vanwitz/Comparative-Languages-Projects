@@ -147,7 +147,7 @@ public class Hw4
     }
   }
 
-  public static void GenerateCommonCityNamesFile()
+  public static void GenerateCommonCityNamesFile(Action<string> processCityDelegate = null)
   {
     try
     {
@@ -165,8 +165,6 @@ public class Hw4
           // Skip if both states are the same
           if (state1 == state2)
             continue;
-
-          // Console.WriteLine($"Processing cities for {state1} and {state2}");
 
           // Read the file containing zip codes data for the current state
           string filePath = "zipcodes.txt";
@@ -186,7 +184,13 @@ public class Hw4
             // Find common cities between the two states
             IEnumerable<string> commonCities = cities1.Intersect(cities2);
 
-            //Console.WriteLine($"Common cities between {state1} and {state2}: {string.Join(", ", commonCities)}");
+            if (processCityDelegate != null)
+            {
+              foreach (string city in commonCities)
+              {
+                processCityDelegate(city); // Process each city using the delegate
+              }
+            }
 
             if (commonCityNames.Count == 0)
             {
@@ -209,10 +213,10 @@ public class Hw4
       File.WriteAllLines("CommonCityNames.txt", sortedCommonCityNames);
 
       /* Console.WriteLine("Common city names written to CommonCityNames.txt:");
-       foreach (var city in sortedCommonCityNames)
-       {
-         Console.WriteLine(city);
-       } */
+         foreach (var city in sortedCommonCityNames)
+         {
+           Console.WriteLine(city);
+         } */
     }
     catch (Exception ex)
     {
