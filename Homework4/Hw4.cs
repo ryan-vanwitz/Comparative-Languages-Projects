@@ -38,7 +38,7 @@ public class Hw4
     // Display the total number of lines with insufficient fields
     if (insufficientFieldCount > 0)
     {
-      Console.WriteLine($"Total lines with insufficient fields: {insufficientFieldCount}");
+      // Console.WriteLine($"Total lines with insufficient fields: {insufficientFieldCount}");
     }
 
     GenerateCommonCityNamesFile();
@@ -225,13 +225,13 @@ public class Hw4
   }
 
 
-  public static void GenerateLatLonFile()
+  public static void GenerateLatLonFile(bool? successfulParsing = null)
   {
     // Read the list of zip codes from zips.txt
     List<string> zipCodes = File.ReadAllLines("zips.txt").ToList();
 
     // Create a dictionary to store latitude and longitude for each zip code
-    Dictionary<string, Tuple<double, double>> latLonMap = new Dictionary<string, Tuple<double, double>>();
+    Dictionary<string, Tuple<double?, double?>> latLonMap = new Dictionary<string, Tuple<double?, double?>>();
 
     // Read zip code data from zipcodes.txt and populate the dictionary
     using (StreamReader sr = new StreamReader("zipcodes.txt"))
@@ -241,30 +241,40 @@ public class Hw4
       {
         string[] fields = line.Split(new char[] { '\t' }, StringSplitOptions.None);
 
-        // Debugging output
-        // Console.WriteLine($"Fields array length: {fields.Length}");
-        //Console.WriteLine($"Line: {line}");
-
         try
         {
           string zipCode = fields[1]; // Assuming zip code is at index 1
-          double latitude = 0.0;
-          double longitude = 0.0;
+          double? latitude = null;
+          double? longitude = null;
 
           // Check if latitude and longitude fields are present and parse them
           if (fields.Length > 6)
           {
-            double.TryParse(fields[6], out latitude);
+            double tempLatitude;
+            if (double.TryParse(fields[6], out tempLatitude))
+            {
+              latitude = tempLatitude;
+            }
           }
           if (fields.Length > 7)
           {
-            double.TryParse(fields[7], out longitude);
+            double tempLongitude;
+            if (double.TryParse(fields[7], out tempLongitude))
+            {
+              longitude = tempLongitude;
+            }
           }
 
-          // If the zip code is not already in the dictionary and latitude/longitude are valid, add it
-          if (!latLonMap.ContainsKey(zipCode) && latitude != 0.0 && longitude != 0.0)
+          // Add zip code and its latitude/longitude to the dictionary if it doesn't already exist
+          if (!latLonMap.ContainsKey(zipCode))
           {
-            latLonMap.Add(zipCode, new Tuple<double, double>(latitude, longitude));
+            latLonMap.Add(zipCode, new Tuple<double?, double?>(latitude, longitude));
+          }
+          else
+          {
+            // Handle duplicate zip code if needed
+            // You can choose to ignore it, update the existing entry, or handle it in any other appropriate way
+            // Console.WriteLine($"Duplicate zip code found: {zipCode}");
           }
         }
         catch (FormatException ex)
@@ -284,12 +294,12 @@ public class Hw4
         if (latLonMap.ContainsKey(zipCode))
         {
           // Get the latitude and longitude for the zip code
-          Tuple<double, double> latLon = latLonMap[zipCode];
-          double latitude = latLon.Item1;
-          double longitude = latLon.Item2;
+          Tuple<double?, double?> latLon = latLonMap[zipCode];
+          double? latitude = latLon.Item1;
+          double? longitude = latLon.Item2;
 
           // Write the zip code, latitude, and longitude to the file
-          sw.WriteLine($"{zipCode} {latitude} {longitude}");
+          sw.WriteLine($"{latitude ?? 0.0} {longitude ?? 0.0}");
         }
         else
         {
@@ -300,6 +310,19 @@ public class Hw4
     }
 
     Console.WriteLine("LatLon.txt generated successfully.");
+
+    // Check if successfulParsing parameter is provided and print a message accordingly
+    if (successfulParsing.HasValue)
+    {
+      if (successfulParsing.Value)
+      {
+        Console.WriteLine("Latitude and longitude parsing was successful for all zip codes.");
+      }
+      else
+      {
+        Console.WriteLine("Latitude and longitude parsing failed for one or more zip codes.");
+      }
+    }
   }
 
   public static void GenerateCityStatesFile()
