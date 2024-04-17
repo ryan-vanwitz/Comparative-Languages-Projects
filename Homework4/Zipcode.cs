@@ -1,3 +1,4 @@
+//Copyright @2024 Ryan Van Witzenburg and ChatGPT
 using System;
 
 // Define the Zipcode class
@@ -56,6 +57,7 @@ public class Zipcode
         return $"{RecordNumber}\t{Code}\t{ZipCodeType}\t{City}\t{State}\t{LocationType}\t{Lat}\t{Long}\t{Xaxis}\t{Yaxis}\t{Zaxis}\t{WorldRegion}\t{Country}\t{LocationText}\t{Location}\t{Decommissioned}\t{TaxReturnsFiled}\t{EstimatedPopulation}\t{TotalWages}\t{Notes}";
     }
 
+    // ChatGPT aided in the making of this method
     // Override the ">" operator to compare two Zipcode objects based on their zip codes
     public static Zipcode operator >(Zipcode zip1, Zipcode zip2)
     {
@@ -76,6 +78,7 @@ public class Zipcode
         return result > 0 ? zip1 : zip2;
     }
 
+    // ChatGPT aided in the making of this method
     // Override the "<" operator to compare two Zipcode objects based on their zip codes
     public static Zipcode operator <(Zipcode zip1, Zipcode zip2)
     {

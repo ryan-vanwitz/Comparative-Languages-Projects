@@ -1,3 +1,5 @@
+//Copyright @2024 Ryan Van Witzenburg and ChatGPT
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -50,6 +52,7 @@ public class Hw4
     Console.WriteLine($"Elapsed Time: {elapsedTime.TotalMilliseconds} ms");
   }
 
+  // ChatGPT aided in the making of this method
   private unsafe static void ParseZipcodesFromFile(string filePath, List<Zipcode> zipcodesList, out int insufficientFieldCount)
   {
     insufficientFieldCount = 0;
@@ -214,6 +217,7 @@ public class Hw4
     }
   }
 
+  // ChatGPT aided in the making of this method
   public static void GenerateCommonCityNamesFile(Action<string> processCityDelegate = null)
   {
     try
@@ -295,6 +299,7 @@ public class Hw4
   }
 
 
+  // ChatGPT aided in the making of this method
   public static void GenerateLatLonFile(bool? successfulParsing = null)
   {
     // Read the list of zip codes from zips.txt
@@ -395,6 +400,7 @@ public class Hw4
     }
   }
 
+  // ChatGPT aided in the making of this method
   public static void GenerateCityStatesFile()
   {
     try
