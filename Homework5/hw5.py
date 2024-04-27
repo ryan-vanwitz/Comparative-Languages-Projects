@@ -27,6 +27,9 @@ class CityProcessor:
 
     def __str__(self):
         return f"CityProcessor: {self.name}"
+    
+    def __repr__(self):
+        return f"CityProcessor(states_file={self.states_file}, zipcodes_file={self.zipcodes_file}, zips_file={self.zips_file}, cities_file={self.cities_file})"
 
     def read_states(self):
         with open(self.states_file, "r") as file:
