@@ -66,7 +66,9 @@ class CityProcessor:
                 # print("Checking state:", state)  # Debug print statement
                 # print("City set for state:", city_set)
                 # map and lambda functions
-                if city.lower() in map(lambda x: x.lower(), city_set):                    # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                # filter used
+                filtered_cities = filter(lambda x: x.lower() == city.lower(), city_set)
+                if any(filtered_cities):     
                     states.append(state)
             states = sorted(set(states))  # Sorting and removing duplicates
             # print(f"{city}: {states}")  # Debug print statement
