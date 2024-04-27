@@ -17,6 +17,7 @@ class CityProcessor:
         self.states_file = "states.txt"
         self.zipcodes_file = "zipcodes.txt"
         self.zips_file = "zips.txt"
+        self.cities_file = "cities.txt"
 
     def read_states(self):
         with open(self.states_file, "r") as file:
@@ -44,16 +45,33 @@ class CityProcessor:
                     zip_lat_lon[zipcode] = (lat, lon)
         return zip_lat_lon
 
-    def find_common_cities(self):
-        states = self.read_states()
-        cities_by_state = self.read_zipcodes()
-        common_cities = set.intersection(*(cities_by_state[state] for state in states))
-        return sorted(common_cities)
+    def read_cities(self):
+        with open(self.cities_file, "r") as file:
+            cities = file.read().splitlines()
+        return cities
 
     def get_zip_lat_lon(self, zipcodes):
         zip_lat_lon = self.read_zip_lat_lon()
         return [(zip_lat_lon[zipcode][0], zip_lat_lon[zipcode][1]) for zipcode in zipcodes if zipcode in zip_lat_lon]
 
+    def get_city_states(self):
+        cities_by_state = self.read_zipcodes()
+        cities = self.read_cities()
+        city_states = {}
+        for city in cities:
+            states = []
+            for state, city_set in cities_by_state.items():
+                if city in city_set:
+                    states.append(state)
+            states = sorted(set(states))  # Sorting and removing duplicates
+            city_states[city] = states
+        return city_states
+
+    def find_common_cities(self):
+        states = self.read_states()
+        cities_by_state = self.read_zipcodes()
+        common_cities = set.intersection(*(cities_by_state[state] for state in states))
+        return sorted(common_cities)
 
 if __name__ == "__main__": 
     start_time = time.perf_counter()  # Do not remove this line
@@ -77,6 +95,12 @@ if __name__ == "__main__":
     with open("LatLon.txt", "w") as file:
         for lat, lon in zip_lat_lon:
             file.write(f"{lat} {lon}\n")
+
+    # Problem 3: Generating CityStates.txt
+    city_states = city_processor.get_city_states()
+    with open("CityStates.txt", "w") as file:
+        for city, state in city_states.items():
+            file.write(f"{city}: {' '.join(state)}\n")
 
 
     '''
