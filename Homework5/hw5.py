@@ -19,6 +19,15 @@ class CityProcessor:
         self.zips_file = "zips.txt"
         self.cities_file = "cities.txt"
 
+    def __add__(self, other):
+        if isinstance(other, CityProcessor):
+            return CityProcessor(self.name + other.name)
+        else:
+            raise TypeError("Unsupported operand type for +: 'CityProcessor' and '{type(other).__name__}'")
+
+    def __str__(self):
+        return f"CityProcessor: {self.name}"
+
     def read_states(self):
         with open(self.states_file, "r") as file:
             states = file.read().splitlines()
