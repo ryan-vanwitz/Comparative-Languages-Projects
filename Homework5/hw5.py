@@ -61,7 +61,7 @@ class CityProcessor:
         filtered_cities = filter(lambda x: x.lower() == city.lower(), city_set)
         return any(filtered_cities)
 
-    def get_city_states(self):
+    def get_city_states(self, *args):
         cities_by_state = self.read_zipcodes()
         cities = self.read_cities()
         city_states = {}
