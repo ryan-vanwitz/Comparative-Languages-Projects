@@ -56,14 +56,19 @@ class CityProcessor:
 
     def get_city_states(self):
         cities_by_state = self.read_zipcodes()
+        #print("Cities by state:", cities_by_state)  # Debug print statement
         cities = self.read_cities()
+        print("Cities:", cities)  # Debug print statement
         city_states = {}
         for city in cities:
             states = []
             for state, city_set in cities_by_state.items():
+                print("State?:", state)
                 if city in city_set:
+                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                     states.append(state)
             states = sorted(set(states))  # Sorting and removing duplicates
+            print(f"{city}: {states}")  # Debug print statement
             city_states[city] = states
         return city_states
 
