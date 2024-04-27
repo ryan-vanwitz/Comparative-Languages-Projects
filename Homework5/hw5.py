@@ -54,24 +54,20 @@ class CityProcessor:
         zip_lat_lon = self.read_zip_lat_lon()
         return [(zip_lat_lon[zipcode][0], zip_lat_lon[zipcode][1]) for zipcode in zipcodes if zipcode in zip_lat_lon]
 
+    def filter_city_by_name(self, city, city_set):
+        """
+        Helper method to filter city names case-insensitively.
+        """
+        filtered_cities = filter(lambda x: x.lower() == city.lower(), city_set)
+        return any(filtered_cities)
+
     def get_city_states(self):
         cities_by_state = self.read_zipcodes()
-        #print("Cities by state:", cities_by_state)  # Debug print statement
         cities = self.read_cities()
-        # print("Cities:", cities)  # Debug print statement
         city_states = {}
         for city in cities:
-            states = []
-            for state, city_set in cities_by_state.items():
-                # print("Checking state:", state)  # Debug print statement
-                # print("City set for state:", city_set)
-                # map and lambda functions
-                # filter used
-                filtered_cities = filter(lambda x: x.lower() == city.lower(), city_set)
-                if any(filtered_cities):     
-                    states.append(state)
+            states = [state for state, city_set in cities_by_state.items() if self.filter_city_by_name(city, city_set)]
             states = sorted(set(states))  # Sorting and removing duplicates
-            # print(f"{city}: {states}")  # Debug print statement
             city_states[city] = states
         return city_states
 
