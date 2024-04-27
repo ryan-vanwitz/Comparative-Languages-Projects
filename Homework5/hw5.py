@@ -64,12 +64,10 @@ class CityProcessor:
     def get_city_states(self, *args):
         cities_by_state = self.read_zipcodes()
         cities = self.read_cities()
-        city_states = {}
         for city in cities:
             states = [state for state, city_set in cities_by_state.items() if self.filter_city_by_name(city, city_set)]
             states = sorted(set(states))  # Sorting and removing duplicates
-            city_states[city] = states
-        return city_states
+            yield city, states
 
     def find_common_cities(self):
         states = self.read_states()
@@ -101,10 +99,10 @@ if __name__ == "__main__":
             file.write(f"{lat} {lon}\n")
 
     # Problem 3: Generating CityStates.txt
-    city_states = city_processor.get_city_states()
     with open("CityStates.txt", "w") as file:
-        for city, state in city_states.items():
-            file.write(f"{' '.join(state)}\n")
+      for city_state in city_processor.get_city_states():
+        city, states = city_state
+        file.write(f"{' '.join(states)}\n")
 
 
     '''
