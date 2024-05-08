@@ -3,6 +3,9 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <string>
+#include <map>
+#include <vector>
 
 using namespace std;
 
@@ -36,7 +39,14 @@ void Parser::handlePrint(const string &variable)
     auto it = variables.find(variable);
     if (it != variables.end())
     {
-        cout << variable << "=" << it->second << endl;
+        if (it->second.front() == '"' && it->second.back() == '"')
+        {
+            cout << variable << "=" << it->second << endl; // Print string variable with double quotes
+        }
+        else
+        {
+            cout << variable << "=" << it->second << endl; // Print integer variable without double quotes
+        }
     }
     else
     {
@@ -47,11 +57,36 @@ void Parser::handlePrint(const string &variable)
 
 void Parser::handleAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
-    // Handle assignment
-    // You need to implement this function according to your new approach
+    if (value.front() == '"' && value.back() == '"')
+    {
+        // If the value is enclosed in double quotes, it's a string
+        variables[variable] = value.substr(1, value.size() - 2); // Remove the quotes
+    }
+    else
+    {
+        // Otherwise, try to parse it as an integer or assign from another variable
+        auto it = variables.find(value);
+        if (it != variables.end())
+        {
+            variables[variable] = it->second;
+        }
+        else
+        {
+            try
+            {
+                int intValue = stoi(value);
+                variables[variable] = to_string(intValue); // Store as string
+            }
+            catch (const invalid_argument &)
+            {
+                cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                key = false;
+            }
+        }
+    }
 }
 
-void Parser::handleAdditionAssignment(const string &variable, const string &value, const vector<string> &tokens)
+/* void Parser::handleAdditionAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
 }
 
@@ -61,7 +96,7 @@ void Parser::handleSubtractionAssignment(const string &variable, const string &v
 
 void Parser::handleMultiplicationAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
-}
+} */
 
 void Parser::handleOperator(const vector<string> &tokens)
 {
@@ -75,15 +110,15 @@ void Parser::handleOperator(const vector<string> &tokens)
     }
     else if (op == "+=")
     {
-        handleAdditionAssignment(variable, value, tokens); // Handle addition assignment
+        // handleAdditionAssignment(variable, value, tokens); // Handle addition assignment
     }
     else if (op == "-=")
     {
-        handleSubtractionAssignment(variable, value, tokens); // Handle subtraction assignment
+        // handleSubtractionAssignment(variable, value, tokens); // Handle subtraction assignment
     }
     else if (op == "*=")
     {
-        handleMultiplicationAssignment(variable, value, tokens); // Handle multiplication assignment
+        // handleMultiplicationAssignment(variable, value, tokens); // Handle multiplication assignment
     }
     else
     {
