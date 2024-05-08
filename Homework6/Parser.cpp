@@ -43,9 +43,13 @@ void Parser::handlePrint(const string &variable)
         {
             cout << variable << "=" << it->second << endl; // Print string variable with double quotes
         }
-        else
+        else if (all_of(it->second.begin(), it->second.end(), ::isdigit) || (it->second.front() == '-' && all_of(it->second.begin() + 1, it->second.end(), ::isdigit)))
         {
             cout << variable << "=" << it->second << endl; // Print integer variable without double quotes
+        }
+        else
+        {
+            cout << variable << "=\"" << it->second << "\"" << endl; // Print string variable with double quotes
         }
     }
     else
@@ -57,6 +61,7 @@ void Parser::handlePrint(const string &variable)
 
 void Parser::handleAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
+    // cout << "Variable: " << variable << "     Value: " << value << endl;
     if (value.front() == '"' && value.back() == '"')
     {
         // If the value is enclosed in double quotes, it's a string
@@ -127,19 +132,73 @@ void Parser::handleOperator(const vector<string> &tokens)
     }
 }
 
+std::string stringBuilder(const std::vector<std::string> &tokens, size_t start)
+{
+    std::string result;
+    size_t end = tokens.size();
+
+    // Concatenate tokens starting from 'start' index
+    for (size_t i = start; i < end; ++i)
+    {
+        result += tokens[i];
+        if (tokens[i].back() == '"' && tokens[i].front() != '"')
+        {
+            // If the token ends with a double quote and doesn't start with one, it marks the end of the string
+            break;
+        }
+        result += " "; // Add space between tokens to reconstruct original string
+    }
+
+    // Remove double quotes from the resulting string
+    result.erase(std::remove(result.begin(), result.end(), '"'), result.end());
+
+    return result;
+}
+
+std::vector<std::string> reconstructStringToken(const std::vector<std::string> &tokens, size_t start)
+{
+    std::vector<std::string> newTokens;
+    newTokens.push_back(tokens[0]); // Add the variable name
+    newTokens.push_back(tokens[1]); // Add the assignment operator
+    if (tokens[2].back() != '"' && tokens[2].front() != '"')
+        newTokens.push_back(stringBuilder(tokens, start)); // Add the reconstructed string token
+    return newTokens;
+}
+
 void Parser::interpretLine(const string &line)
 {
     if (line.empty())
-    {           // Check if the line is empty
-        return; // If so, return without further processing
+    {
+        return;
     }
 
+    // Tokenize the line based on spaces
     istringstream iss(line);
-    string token;
     vector<string> tokens;
+    string token;
     while (iss >> token)
     {
-        tokens.push_back(token);
+        // Check if the token starts with a double quote
+        if (token.front() == '"')
+        {
+            // Concatenate tokens until the end of the string is found
+            string concatenatedToken = token;
+            while (concatenatedToken.back() != '"')
+            {
+                if (!(iss >> token))
+                {
+                    // End of line reached before the end of the string
+                    cerr << "Syntax error: " << line << endl;
+                    return;
+                }
+                concatenatedToken += " " + token;
+            }
+            tokens.push_back(concatenatedToken);
+        }
+        else
+        {
+            tokens.push_back(token);
+        }
     }
 
     if (tokens.empty())
@@ -147,28 +206,28 @@ void Parser::interpretLine(const string &line)
         return;
     }
 
+    // Check for syntax errors in the line
     if (tokens[tokens.size() - 1] != "ENDFOR" && tokens[tokens.size() - 1] != ";")
     {
-        // Check for syntax errors in the line
-        cerr << "Syntax error: " << line << endl; // Print syntax error message
-        return;                                   // Return without further processing
+        cerr << "Syntax error: " << line << endl;
+        return;
     }
 
     if (key)
-    { // Check if parsing is enabled
+    {
         if (tokens[0] == "FOR")
         {
-            handleForLoop(tokens); // Handle a for loop command
+            handleForLoop(tokens);
             numberOfLine++;
         }
         else if (tokens[0] == "PRINT")
         {
-            handlePrint(tokens[1]); // Handle a print command
+            handlePrint(tokens[1]);
             numberOfLine++;
         }
         else
         {
-            handleOperator(tokens); // Handle other operator commands
+            handleOperator(tokens);
             numberOfLine++;
         }
     }
