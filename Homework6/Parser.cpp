@@ -132,39 +132,6 @@ void Parser::handleOperator(const vector<string> &tokens)
     }
 }
 
-std::string stringBuilder(const std::vector<std::string> &tokens, size_t start)
-{
-    std::string result;
-    size_t end = tokens.size();
-
-    // Concatenate tokens starting from 'start' index
-    for (size_t i = start; i < end; ++i)
-    {
-        result += tokens[i];
-        if (tokens[i].back() == '"' && tokens[i].front() != '"')
-        {
-            // If the token ends with a double quote and doesn't start with one, it marks the end of the string
-            break;
-        }
-        result += " "; // Add space between tokens to reconstruct original string
-    }
-
-    // Remove double quotes from the resulting string
-    result.erase(std::remove(result.begin(), result.end(), '"'), result.end());
-
-    return result;
-}
-
-std::vector<std::string> reconstructStringToken(const std::vector<std::string> &tokens, size_t start)
-{
-    std::vector<std::string> newTokens;
-    newTokens.push_back(tokens[0]); // Add the variable name
-    newTokens.push_back(tokens[1]); // Add the assignment operator
-    if (tokens[2].back() != '"' && tokens[2].front() != '"')
-        newTokens.push_back(stringBuilder(tokens, start)); // Add the reconstructed string token
-    return newTokens;
-}
-
 void Parser::interpretLine(const string &line)
 {
     if (line.empty())
