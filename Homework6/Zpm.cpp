@@ -15,14 +15,72 @@ void handleForLoop(const vector<string> &tokens)
     // Handle a for loop command
 }
 
-void handlePrint(const string &token)
+void handlePrint(const string &variable)
 {
-    // Handle a print command
+    auto it = variables.find(variable); // Get the iterator to the variable in the map
+    if (it != variables.end())
+    {                                                  // Check if the variable is assigned
+        cout << variable << "=" << it->second << endl; // Print variable name and value
+    }
+    else
+    {
+        cerr << "RUNTIME ERROR: line " << numberOfLine << endl; // Print error message
+        key = false;                                            // Disable further parsing
+    }
+}
+
+void handleAssignment(const string &variable, const string &value, const vector<string> &tokens)
+{
+    try
+    {
+        // Attempt to parse the value as an integer
+        int intValue;
+        if (value[0] == '-')
+        {
+            intValue = stoi(value.substr(1)); // Parse without the negative sign
+            intValue *= -1;                   // Adjust the parsed value to be negative
+        }
+        else
+        {
+            intValue = stoi(value);
+        }
+        // Store the parsed value
+        variables[variable] = to_string(intValue);
+    }
+    catch (const invalid_argument &)
+    {
+        // If parsing as integer fails, store as string
+        variables[variable] = value;
+    }
 }
 
 void handleOperator(const vector<string> &tokens)
 {
-    // Handle other operator commands
+    string variable = tokens[0]; // Get the variable name
+    string op = tokens[1];       // Get the operator
+    string value = tokens[2];    // Get the value
+
+    if (op == "=")
+    {
+        handleAssignment(variable, value, tokens); // Handle assignment
+    }
+    else if (op == "+=")
+    {
+        // handleAdditionAssignment(variable, value, tokens); // Handle addition assignment
+    }
+    else if (op == "-=")
+    {
+        // handleSubtractionAssignment(variable, value, tokens); // Handle subtraction assignment
+    }
+    else if (op == "*=")
+    {
+        // handleMultiplicationAssignment(variable, value, tokens); // Handle multiplication assignment
+    }
+    else
+    {
+        cerr << "Unknown operator: " << op << " at line " << numberOfLine << endl; // Handle unknown operator
+        key = false;                                                               // Disable further parsing
+    }
 }
 
 void interpretLine(const string &line)
