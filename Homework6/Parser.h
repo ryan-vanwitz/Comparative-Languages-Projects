@@ -18,9 +18,9 @@ private:
     void handleForLoop(const std::vector<std::string> &tokens);
     void handlePrint(const std::string &variable);
     void handleAssignment(const std::string &variable, const std::string &value, const std::vector<std::string> &tokens);
-    // void handleAdditionAssignment(const string &variable, const string &value, const vector<string> &tokens);
-    // void handleSubtractionAssignment(const string &variable, const string &value, const vector<string> &tokens);
-    // void handleMultiplicationAssignment(const string &variable, const string &value, const vector<string> &tokens);
+    void handleAdditionAssignment(const std::string &variable, const std::string &value, const std::vector<std::string> &tokens);
+    void handleSubtractionAssignment(const std::string &variable, const std::string &value, const std::vector<std::string> &tokens);
+    void handleMultiplicationAssignment(const std::string &variable, const std::string &value, const std::vector<std::string> &tokens);
     void handleOperator(const std::vector<std::string> &tokens);
     void interpretLine(const std::string &line);
 };

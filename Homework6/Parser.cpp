@@ -84,24 +84,171 @@ void Parser::handleAssignment(const string &variable, const string &value, const
             }
             catch (const invalid_argument &)
             {
-                cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                cerr << "RUNTIME ERROR: line " << numberOfLine << "It was the saoce " << value << endl;
                 key = false;
             }
         }
     }
 }
 
-/* void Parser::handleAdditionAssignment(const string &variable, const string &value, const vector<string> &tokens)
+void Parser::handleAdditionAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
+    auto it = variables.find(variable);
+    if (it != variables.end())
+    {
+        // Get the current value of the variable
+        string currentValue = it->second;
+
+        // Parse the value to be added
+        string parsedValue = value;
+        if (value.front() != '"' && value.back() != '"')
+        {
+            auto valueIt = variables.find(value);
+            if (valueIt != variables.end())
+            {
+                parsedValue = valueIt->second;
+            }
+            else
+            {
+                try
+                {
+                    int intValue = stoi(value);
+                    parsedValue = to_string(intValue);
+                }
+                catch (const invalid_argument &)
+                {
+                    cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                    key = false;
+                    return;
+                }
+            }
+        }
+
+        // Perform addition for integers
+        try
+        {
+            int result = stoi(currentValue) + stoi(parsedValue);
+            variables[variable] = to_string(result);
+        }
+        catch (const invalid_argument &)
+        {
+            cerr << "RUNTIME ERROR  messing up here: line " << numberOfLine << endl;
+            key = false;
+            return;
+        }
+    }
+    else
+    {
+        cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+        key = false;
+    }
 }
 
 void Parser::handleSubtractionAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
+    auto it = variables.find(variable);
+    if (it != variables.end())
+    {
+        // Get the current value of the variable
+        string currentValue = it->second;
+
+        // Parse the value to be subtracted
+        string parsedValue = value;
+        if (value.front() != '"' && value.back() != '"')
+        {
+            auto valueIt = variables.find(value);
+            if (valueIt != variables.end())
+            {
+                parsedValue = valueIt->second;
+            }
+            else
+            {
+                try
+                {
+                    int intValue = stoi(value);
+                    parsedValue = to_string(intValue);
+                }
+                catch (const invalid_argument &)
+                {
+                    cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                    key = false;
+                    return;
+                }
+            }
+        }
+
+        // Perform subtraction for integers
+        try
+        {
+            int result = stoi(currentValue) - stoi(parsedValue);
+            variables[variable] = to_string(result);
+        }
+        catch (const invalid_argument &)
+        {
+            cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+            key = false;
+            return;
+        }
+    }
+    else
+    {
+        cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+        key = false;
+    }
 }
 
 void Parser::handleMultiplicationAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
-} */
+    auto it = variables.find(variable);
+    if (it != variables.end())
+    {
+        // Get the current value of the variable
+        string currentValue = it->second;
+
+        // Parse the value to be multiplied
+        string parsedValue = value;
+        if (value.front() != '"' && value.back() != '"')
+        {
+            auto valueIt = variables.find(value);
+            if (valueIt != variables.end())
+            {
+                parsedValue = valueIt->second;
+            }
+            else
+            {
+                try
+                {
+                    int intValue = stoi(value);
+                    parsedValue = to_string(intValue);
+                }
+                catch (const invalid_argument &)
+                {
+                    cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                    key = false;
+                    return;
+                }
+            }
+        }
+
+        // Perform multiplication for integers
+        try
+        {
+            int result = stoi(currentValue) * stoi(parsedValue);
+            variables[variable] = to_string(result);
+        }
+        catch (const invalid_argument &)
+        {
+            cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+            key = false;
+            return;
+        }
+    }
+    else
+    {
+        cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+        key = false;
+    }
+}
 
 void Parser::handleOperator(const vector<string> &tokens)
 {
@@ -115,15 +262,15 @@ void Parser::handleOperator(const vector<string> &tokens)
     }
     else if (op == "+=")
     {
-        // handleAdditionAssignment(variable, value, tokens); // Handle addition assignment
+        handleAdditionAssignment(variable, value, tokens); // Handle addition assignment
     }
     else if (op == "-=")
     {
-        // handleSubtractionAssignment(variable, value, tokens); // Handle subtraction assignment
+        handleSubtractionAssignment(variable, value, tokens); // Handle subtraction assignment
     }
     else if (op == "*=")
     {
-        // handleMultiplicationAssignment(variable, value, tokens); // Handle multiplication assignment
+        handleMultiplicationAssignment(variable, value, tokens); // Handle multiplication assignment
     }
     else
     {
