@@ -18,6 +18,7 @@ void Parser::run(const string &fileName)
         string line;
         while (getline(file, line))
         {
+            numberOfLine++;
             interpretLine(line);
         }
         file.close();
@@ -62,6 +63,8 @@ void Parser::handlePrint(const string &variable)
 void Parser::handleAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
     // cout << "Variable: " << variable << "     Value: " << value << endl;
+    // cout << "Assignment: " << variable << " = " << value << endl; // Debug print statement
+
     if (value.front() == '"' && value.back() == '"')
     {
         // If the value is enclosed in double quotes, it's a string
@@ -94,47 +97,38 @@ void Parser::handleAssignment(const string &variable, const string &value, const
 void Parser::handleAdditionAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
     auto it = variables.find(variable);
+    // cout << "Addition Assignment: " << variable << " += " << value << endl; // Debug print statement
+
     if (it != variables.end())
     {
         // Get the current value of the variable
         string currentValue = it->second;
 
         // Parse the value to be added
-        string parsedValue = value;
-        if (value.front() != '"' && value.back() != '"')
-        {
-            auto valueIt = variables.find(value);
-            if (valueIt != variables.end())
-            {
-                parsedValue = valueIt->second;
-            }
-            else
-            {
-                try
-                {
-                    int intValue = stoi(value);
-                    parsedValue = to_string(intValue);
-                }
-                catch (const invalid_argument &)
-                {
-                    cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
-                    key = false;
-                    return;
-                }
-            }
-        }
+        string parsedValue = parseVariable(value);
 
-        // Perform addition for integers
-        try
+        // cout << "Current Value: " << currentValue << endl;
+        // cout << "Parsed Value: " << parsedValue << endl;
+
+        // Check if both values are integers
+        if (isInteger(currentValue) && isInteger(parsedValue))
         {
+            // Perform addition for integers
+            // cout << "Negative 5" << endl;
             int result = stoi(currentValue) + stoi(parsedValue);
+            // cout << "Result: " << result << endl;
             variables[variable] = to_string(result);
         }
-        catch (const invalid_argument &)
+        else if (!isInteger(currentValue) && !isInteger(parsedValue))
         {
-            cerr << "RUNTIME ERROR  messing up here: line " << numberOfLine << endl;
+            // Concatenate strings if both values are strings
+            variables[variable] = currentValue + parsedValue;
+        }
+        else
+        {
+            // Handle incompatible types
+            cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
             key = false;
-            return;
         }
     }
     else
@@ -142,6 +136,59 @@ void Parser::handleAdditionAssignment(const string &variable, const string &valu
         cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
         key = false;
     }
+}
+
+string Parser::parseVariable(const string &value)
+{
+    // Check if the value is an integer
+    if (isInteger(value))
+    {
+        return value;
+    }
+    else
+    {
+        // Remove surrounding quotes from a string
+        if (value.front() == '"' && value.back() == '"' && value.length() >= 2)
+        {
+            return value.substr(1, value.length() - 2);
+        }
+        else if ((value.front() == '-' && isInteger(value.substr(1))) || isInteger(value))
+        {
+            // Handle negative integer or positive integer
+            return value;
+        }
+        else
+        {
+            // Retrieve value from variables map
+            auto it = variables.find(value);
+            if (it != variables.end())
+            {
+                return it->second;
+            }
+            else
+            {
+                // Handle invalid value
+                cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                key = false;
+                return "";
+            }
+        }
+    }
+}
+
+bool Parser::isInteger(const string &str)
+{
+    // Check if the string represents an integer
+    if (str.empty())
+    {
+        return false;
+    }
+
+    // Check if the string starts with a negative sign
+    size_t start = (str[0] == '-') ? 1 : 0;
+
+    // Check if all characters after the optional negative sign are digits
+    return all_of(str.begin() + start, str.end(), ::isdigit);
 }
 
 void Parser::handleSubtractionAssignment(const string &variable, const string &value, const vector<string> &tokens)
@@ -254,7 +301,17 @@ void Parser::handleOperator(const vector<string> &tokens)
 {
     string variable = tokens[0]; // Get the variable name
     string op = tokens[1];       // Get the operator
-    string value = tokens[2];    // Get the value
+    string value;
+    if (tokens[2] == "\"")
+    {
+        value = "\" \"";
+    }
+    else
+    {
+        value = tokens[2]; // Get the value
+    }
+
+    // cout << "Operator: " << op << ", Variable: " << variable << ", Value: " << tokens[2] << endl; // Debug statement
 
     if (op == "=")
     {
@@ -281,8 +338,11 @@ void Parser::handleOperator(const vector<string> &tokens)
 
 void Parser::interpretLine(const string &line)
 {
+    // numberOfLine++;
+
     if (line.empty())
     {
+        // numberOfLine++;
         return;
     }
 
@@ -312,8 +372,17 @@ void Parser::interpretLine(const string &line)
         else
         {
             tokens.push_back(token);
+            // numberOfLine++;
         }
     }
+
+    // Debug output to check tokens
+    /* cout << "Tokens: ";
+    for (const auto &t : tokens)
+    {
+        cout << t << " ";
+    }
+    cout << endl; */
 
     if (tokens.empty())
     {
@@ -332,17 +401,17 @@ void Parser::interpretLine(const string &line)
         if (tokens[0] == "FOR")
         {
             handleForLoop(tokens);
-            numberOfLine++;
+            // numberOfLine++;
         }
         else if (tokens[0] == "PRINT")
         {
             handlePrint(tokens[1]);
-            numberOfLine++;
+            // numberOfLine++;
         }
         else
         {
             handleOperator(tokens);
-            numberOfLine++;
+            // numberOfLine++;
         }
     }
 }
