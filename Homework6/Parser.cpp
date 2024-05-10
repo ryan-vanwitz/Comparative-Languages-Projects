@@ -51,6 +51,7 @@ void Parser::handleForLoop(const vector<string> &tokens)
     if (isInteger(tokens[1]))
     {
         iterations = stoi(tokens[1]); // If it's an integer value
+        // cout << "Iterations (integer): " << iterations << endl;
     }
     else
     {
@@ -59,6 +60,7 @@ void Parser::handleForLoop(const vector<string> &tokens)
         if (it != variables.end() && isInteger(it->second))
         {
             iterations = stoi(it->second); // If found and it's an integer, use its value
+            // cout << "Iterations (from map): " << iterations << endl;
         }
         else
         {
@@ -73,11 +75,29 @@ void Parser::handleForLoop(const vector<string> &tokens)
     int j = 2; // Start index for parameters
     for (int i = 0; i < iterations; i++)
     {
+        // cout << "Interpreting iteration: " << i + 1 << endl; // Debug output
         while (j < tokens.size() - 1) // Iterate until the end of the tokens
         {
-            string parameter = tokens[j] + " " + tokens[j + 1] + " " + tokens[j + 2] + " " + tokens[j + 3]; // Construct parameter string
-            interpretLine(parameter);                                                                       // Interpret and execute the parameter
-            j += 4;                                                                                         // Move to the next parameter
+            string parameter;
+            // Debug output to check tokens
+            /* cout << "Tokens: ";
+            for (const auto &t : tokens)
+            {
+                cout << t << " ";
+            }
+            cout << endl; */
+            if (tokens[j] != "PRINT")
+            {
+                parameter = tokens[j] + " " + tokens[j + 1] + " " + tokens[j + 2] + " " + tokens[j + 3]; // Construct parameter string
+                j += 4;                                                                                  // Move to the next parameter
+            }
+            else
+            {
+                parameter = tokens[j] + " " + tokens[j + 1] + " " + tokens[j + 2]; // Construct parameter string
+                j += 3;                                                            // Move to the next parameter
+            }
+            // cout << "Interpreting parameter: " << parameter << endl; // Debug output
+            interpretLine(parameter); // Interpret and execute the parameter
         }
         j = 2; // Reset index for parameters
     }
@@ -227,7 +247,7 @@ string Parser::parseVariable(const string &value)
 bool Parser::isInteger(const string &str)
 {
     // Check if the string represents an integer
-    if (str.empty())
+    if (str.empty() || str == "-")
     {
         return false;
     }
