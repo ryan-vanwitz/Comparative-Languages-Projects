@@ -32,7 +32,55 @@ void Parser::run(const string &fileName)
 
 void Parser::handleForLoop(const vector<string> &tokens)
 {
-    // Handle a for loop command
+    // Check if the for loop has the correct number of tokens
+    if (tokens.size() < 6 || tokens[tokens.size() - 1] != "ENDFOR")
+    {
+        // Check for syntax errors in the for loop command
+        cerr << "Syntax error: ";
+        for (const auto &token : tokens)
+        {
+            cerr << token << " ";
+        }
+        cerr << endl; // Print syntax error message
+        key = false;  // Disable further parsing
+        return;       // Exit method
+    }
+
+    // Parse the number of iterations
+    int iterations;
+    if (isInteger(tokens[1]))
+    {
+        iterations = stoi(tokens[1]); // If it's an integer value
+    }
+    else
+    {
+        // Try to find the variable in the map
+        auto it = variables.find(tokens[1]);
+        if (it != variables.end() && isInteger(it->second))
+        {
+            iterations = stoi(it->second); // If found and it's an integer, use its value
+        }
+        else
+        {
+            // Otherwise, it's an error
+            cerr << "RUNTIME ERROR: Invalid loop iteration count at line " << numberOfLine << endl;
+            key = false;
+            return;
+        }
+    }
+
+    // Iterate over parameters for the specified number of iterations
+    int j = 2; // Start index for parameters
+    for (int i = 0; i < iterations; i++)
+    {
+        while (j < tokens.size() - 1) // Iterate until the end of the tokens
+        {
+            string parameter = tokens[j] + " " + tokens[j + 1] + " " + tokens[j + 2] + " " + tokens[j + 3]; // Construct parameter string
+            interpretLine(parameter);                                                                       // Interpret and execute the parameter
+            j += 4;                                                                                         // Move to the next parameter
+        }
+        j = 2; // Reset index for parameters
+    }
 }
 
 void Parser::handlePrint(const string &variable)
@@ -199,39 +247,28 @@ void Parser::handleSubtractionAssignment(const string &variable, const string &v
         // Get the current value of the variable
         string currentValue = it->second;
 
-        // Parse the value to be subtracted
-        string parsedValue = value;
-        if (value.front() != '"' && value.back() != '"')
-        {
-            auto valueIt = variables.find(value);
-            if (valueIt != variables.end())
-            {
-                parsedValue = valueIt->second;
-            }
-            else
-            {
-                try
-                {
-                    int intValue = stoi(value);
-                    parsedValue = to_string(intValue);
-                }
-                catch (const invalid_argument &)
-                {
-                    cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
-                    key = false;
-                    return;
-                }
-            }
-        }
+        // Parse the value to be multiplied
+        string parsedValue = parseVariable(value);
 
-        // Perform subtraction for integers
-        try
+        // Check if the variable is an integer
+        if (isInteger(currentValue) && isInteger(parsedValue))
         {
-            int result = stoi(currentValue) - stoi(parsedValue);
-            variables[variable] = to_string(result);
+            // Perform subtraction for integers
+            try
+            {
+                int result = stoi(currentValue) - stoi(parsedValue);
+                variables[variable] = to_string(result);
+            }
+            catch (const invalid_argument &)
+            {
+                cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                key = false;
+                return;
+            }
         }
-        catch (const invalid_argument &)
+        else
         {
+            // Handle incompatible types (e.g., subtraction of string with an integer)
             cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
             key = false;
             return;
@@ -253,38 +290,27 @@ void Parser::handleMultiplicationAssignment(const string &variable, const string
         string currentValue = it->second;
 
         // Parse the value to be multiplied
-        string parsedValue = value;
-        if (value.front() != '"' && value.back() != '"')
-        {
-            auto valueIt = variables.find(value);
-            if (valueIt != variables.end())
-            {
-                parsedValue = valueIt->second;
-            }
-            else
-            {
-                try
-                {
-                    int intValue = stoi(value);
-                    parsedValue = to_string(intValue);
-                }
-                catch (const invalid_argument &)
-                {
-                    cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
-                    key = false;
-                    return;
-                }
-            }
-        }
+        string parsedValue = parseVariable(value);
 
-        // Perform multiplication for integers
-        try
+        // Check if the variable is an integer
+        if (isInteger(currentValue) && isInteger(parsedValue))
         {
-            int result = stoi(currentValue) * stoi(parsedValue);
-            variables[variable] = to_string(result);
+            // Perform multiplication for integers
+            try
+            {
+                int result = stoi(currentValue) * stoi(parsedValue);
+                variables[variable] = to_string(result);
+            }
+            catch (const invalid_argument &)
+            {
+                cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
+                key = false;
+                return;
+            }
         }
-        catch (const invalid_argument &)
+        else
         {
+            // Handle incompatible types (e.g., multiplication of string with an integer)
             cerr << "RUNTIME ERROR: line " << numberOfLine << endl;
             key = false;
             return;
@@ -296,7 +322,6 @@ void Parser::handleMultiplicationAssignment(const string &variable, const string
         key = false;
     }
 }
-
 void Parser::handleOperator(const vector<string> &tokens)
 {
     string variable = tokens[0]; // Get the variable name
