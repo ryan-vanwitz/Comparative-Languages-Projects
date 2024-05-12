@@ -1,3 +1,4 @@
+// Copyright 2024 Ryan Van Witzenburg and ChatGPT
 #include "Parser.h"
 #include <iostream>
 #include <fstream>
@@ -9,6 +10,7 @@
 
 using namespace std;
 
+// ChatGPT aided in the making of this method
 void Parser::run(const string &fileName)
 {
     ifstream file(fileName);
@@ -30,6 +32,7 @@ void Parser::run(const string &fileName)
     }
 }
 
+// ChatGPT aided in the making of this method
 void Parser::handleForLoop(const vector<string> &tokens)
 {
     // Check if the for loop has the correct number of tokens
@@ -103,6 +106,7 @@ void Parser::handleForLoop(const vector<string> &tokens)
     }
 }
 
+// ChatGPT aided in the making of this method
 void Parser::handlePrint(const string &variable)
 {
     auto it = variables.find(variable);
@@ -128,6 +132,7 @@ void Parser::handlePrint(const string &variable)
     }
 }
 
+// ChatGPT aided in the making of this method
 void Parser::handleAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
     // cout << "Variable: " << variable << "     Value: " << value << endl;
@@ -162,6 +167,7 @@ void Parser::handleAssignment(const string &variable, const string &value, const
     }
 }
 
+// ChatGPT aided in the making of this method
 void Parser::handleAdditionAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
     auto it = variables.find(variable);
@@ -206,6 +212,7 @@ void Parser::handleAdditionAssignment(const string &variable, const string &valu
     }
 }
 
+// ChatGPT aided in the making of this method
 string Parser::parseVariable(const string &value)
 {
     // Check if the value is an integer
@@ -244,6 +251,7 @@ string Parser::parseVariable(const string &value)
     }
 }
 
+// ChatGPT aided in the making of this method
 bool Parser::isInteger(const string &str)
 {
     // Check if the string represents an integer
@@ -259,6 +267,7 @@ bool Parser::isInteger(const string &str)
     return all_of(str.begin() + start, str.end(), ::isdigit);
 }
 
+// ChatGPT aided in the making of this method
 void Parser::handleSubtractionAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
     auto it = variables.find(variable);
@@ -301,6 +310,7 @@ void Parser::handleSubtractionAssignment(const string &variable, const string &v
     }
 }
 
+// ChatGPT aided in the making of this method
 void Parser::handleMultiplicationAssignment(const string &variable, const string &value, const vector<string> &tokens)
 {
     auto it = variables.find(variable);
@@ -342,6 +352,8 @@ void Parser::handleMultiplicationAssignment(const string &variable, const string
         key = false;
     }
 }
+
+// ChatGPT aided in the making of this method
 void Parser::handleOperator(const vector<string> &tokens)
 {
     string variable = tokens[0]; // Get the variable name
@@ -381,6 +393,7 @@ void Parser::handleOperator(const vector<string> &tokens)
     }
 }
 
+// ChatGPT aided in the making of this method
 void Parser::interpretLine(const string &line)
 {
     // numberOfLine++;

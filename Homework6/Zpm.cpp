@@ -1,3 +1,4 @@
+// Copyright 2024 Ryan Van Witzenburg and ChatGPT
 #include <iostream>
 #include "Parser.h"
 

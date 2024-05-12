@@ -1,3 +1,4 @@
+// Copyright 2024 Ryan Van Witzenburg and ChatGPT
 #ifndef PARSER_H
 #define PARSER_H
 
